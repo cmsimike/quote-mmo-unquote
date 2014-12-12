@@ -20,8 +20,7 @@ public class App {
             @Override
             public void onData(SocketIOClient client, LocationObject data, AckRequest ackRequest) {
                 // broadcast messages to all clients
-                //server.getBroadcastOperations().sendEvent("chatevent", data);
-                System.out.println(data);
+                server.getBroadcastOperations().sendEvent("locationevent", data);
             }
         });
 
@@ -29,6 +28,6 @@ public class App {
 
         Thread.sleep(Integer.MAX_VALUE);
 
-        server.stop();
+        //server.stop();
     }
 }

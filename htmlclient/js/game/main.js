@@ -2,7 +2,7 @@
 var userName = 'user' + Math.floor((Math.random()*1000)+1);
 var socket =  io.connect('http://localhost:9092');
 
-var output = console.log;
+
 
 
 function sendLocation(x, y) {
@@ -15,15 +15,12 @@ function sendLocation(x, y) {
 }
 
 socket.on('connect', function() {
-    output("connected");
+    console.log("connected");
 });
 
-socket.on('locationevent', function(data) {
-    output(data);
-});
 
 socket.on('disconnect', function() {
-    output("disconnected");
+    console.log("disconnected");
 });
 
 function sendDisconnect() {
@@ -113,7 +110,7 @@ TopDownGame.Game.prototype = {
 
         this.createItems();
 
-        this.player = this.game.add.sprite(32, 32, 'player');
+        this.player = this.game.add.sprite(32, 32);
         this.game.physics.arcade.enable(this.player);
 
 
@@ -122,6 +119,18 @@ TopDownGame.Game.prototype = {
 
         //move player with cursor keys
         this.cursors = this.game.input.keyboard.createCursorKeys();
+
+        this.spriteCache = {};
+        var that = this;
+        socket.on('locationevent', function (data) {
+            var icon = data.userName == userName ? 'player':'enemy';
+            if(!that.spriteCache[data.userName]) {
+                that.spriteCache[data.userName] = that.items.create(data.x, data.y, icon);
+            }
+            that.spriteCache[data.userName].x = data.x;
+            that.spriteCache[data.userName].y = data.y;
+        });
+
     },
     createItems: function() {
         //create items
@@ -133,29 +142,29 @@ TopDownGame.Game.prototype = {
         //    this.createFromTiledObject(element, this.items);
         //}, this);
     },
-    //find objects in a Tiled layer that containt a property called "type" equal to a certain value
-    findObjectsByType: function(type, map, layer) {
-        var result = new Array();
-        map.objects[layer].forEach(function(element){
-            if(element.properties.type === type) {
-                //Phaser uses top left, Tiled bottom left so we have to adjust
-                //also keep in mind that the cup images are a bit smaller than the tile which is 16x16
-                //so they might not be placed in the exact position as in Tiled
-                element.y -= map.tileHeight;
-                result.push(element);
-            }
-        });
-        return result;
-    },
-    //create a sprite from an object
-    createFromTiledObject: function(element, group) {
-        var sprite = group.create(element.x, element.y, element.properties.sprite);
-
-        //copy all properties to the sprite
-        Object.keys(element.properties).forEach(function(key){
-            sprite[key] = element.properties[key];
-        });
-    },
+    ////find objects in a Tiled layer that containt a property called "type" equal to a certain value
+    //findObjectsByType: function(type, map, layer) {
+    //    var result = new Array();
+    //    map.objects[layer].forEach(function(element){
+    //        if(element.properties.type === type) {
+    //            //Phaser uses top left, Tiled bottom left so we have to adjust
+    //            //also keep in mind that the cup images are a bit smaller than the tile which is 16x16
+    //            //so they might not be placed in the exact position as in Tiled
+    //            element.y -= map.tileHeight;
+    //            result.push(element);
+    //        }
+    //    });
+    //    return result;
+    //},
+    ////create a sprite from an object
+    //createFromTiledObject: function(element, group) {
+    //    var sprite = group.create(element.x, element.y, element.properties.sprite);
+    //
+    //    //copy all properties to the sprite
+    //    Object.keys(element.properties).forEach(function(key){
+    //        sprite[key] = element.properties[key];
+    //    });
+    //},
 
     update: function() {
         //player movement
