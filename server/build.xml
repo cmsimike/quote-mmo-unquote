@@ -48,15 +48,6 @@
   <target name="compile" depends="init-ivy,init,resolve"
         description="compile the source " >
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}"/>
-  </target>
-
-  <target name="dist" depends="compile"
-        description="generate the distribution" >
-    <!-- Create the distribution directory -->
-    <mkdir dir="${dist}/lib"/>
-
-    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
     <javac srcdir="${src}" destdir="${build}">
       <classpath>
           <fileset dir="lib">
@@ -64,6 +55,16 @@
           </fileset>
       </classpath>
     </javac>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}/lib"/>
+
+    <jar destfile="${dist}/lib/MyProject-${DSTAMP}.jar" basedir="${build}">
+        <zipgroupfileset dir="lib" includes="*.jar"/>
+    </jar>
   </target>
 
   <target name="resolve" description="--> retrieve dependencies with ivy">
