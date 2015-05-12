@@ -64,6 +64,9 @@
 
     <jar destfile="${dist}/lib/MyProject-${DSTAMP}.jar" basedir="${build}">
         <zipgroupfileset dir="lib" includes="*.jar"/>
+        <manifest>
+          <attribute name="Main-Class" value="com.xekm.mmo.server.App"/>
+        </manifest>
     </jar>
   </target>
 
